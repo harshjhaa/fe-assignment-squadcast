@@ -17,9 +17,6 @@ Documentation -
    styles
    App.css
    Mentions.css
-3. Components
-   App Component (App.tsx)
-   The App component serves as the main entry point. It renders a title and the Mentions component. It includes a callback function handleMentionChange to receive changes from the Mentions component.
 
 Mentions Component (Mentions.tsx)
 The Mentions component handles user input, displays a dropdown of mention suggestions, and triggers the onChange callback. It utilizes the useMentions custom hook for state management.
