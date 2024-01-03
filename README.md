@@ -34,11 +34,11 @@ The Mentions component handles user input, displays a dropdown of mention sugges
    The project relies on React and its related libraries for building the user interface.
 
 - Running the Project
-   Clone the repository.
-   Navigate to the project directory.
-   Run npm install to install dependencies.
-   Run npm start to start the development server.
-   Open your browser and visit http://127.0.0.1:5173/ to view the application.
+   - Clone the repository.
+   - Navigate to the project directory.
+   - Run npm install to install dependencies.
+   - Run npm start to start the development server.
+   - Open your browser and visit http://127.0.0.1:5173/ to view the application.
    
 - Conclusion
    This Frontend Assignment demonstrates a simple implementation of mentions functionality in a React application. It follows best practices for component-based development and utilizes a custom hook for state management.
