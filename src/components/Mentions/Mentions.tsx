@@ -1,82 +1,60 @@
-import { useState, MouseEvent } from "react";
-import names from "../names.json";
+import React, { useEffect, useRef } from "react";
+import useMentions from "../../utils/customHooks/useMentions";
+import "./Mentions.css";
 
-// Define the interface for the MentionHook custom hook
-interface MentionHook {
-  inpVal: string;
-  mentionOptions: string[];
-  selectedMentions: string[];
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleNameSelect: (e: MouseEvent<HTMLDivElement>) => void;
+// Define the props interface for the Mentions component
+interface MentionProps {
+  onChange: (text: string, mentions: string[]) => void;
 }
 
-// Custom hook for handling mentions logic
-const useMentions: (
-  onMentionChange: (text: string, mentions: string[]) => void
-) => MentionHook = (onMentionChange) => {
-  // State variables for input value, mention options, and selected mentions
-  const [inpVal, setInpVal] = useState("");
-  const [mentionOptions, setMentionOptions] = useState<string[]>([]);
-  const [selectedMentions, setSelectedMentions] = useState<string[]>([]);
+// Mentions component is a functional component
+const Mentions: React.FC<MentionProps> = ({ onChange }) => {
+  // Destructure values from the useMentions custom hook
+  const { inpVal, mentionOptions, handleInputChange, handleNameSelect } =
+    useMentions(onChange);
 
-  // Function to handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    setInpVal(text);
+  // Create a reference for the input element
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    // Check if the text includes '@' for mentions
-    if (text.includes("@")) {
-      const query = text.split("@").pop()?.toLowerCase() || "";
-      const filteredOptions = names
-        .filter((name) => name.toLowerCase().includes(query))
-        .filter((name) => !selectedMentions.includes(name));
-
-      setMentionOptions(filteredOptions);
-    } else {
-      setMentionOptions([]);
+  // useEffect to focus on the input element when the component mounts
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
+  }, []);
 
-    // Extract mentions from the input text
-    const words = text.split(" ");
-    const newMentions = words
-      .filter((word) => word.startsWith("@"))
-      .map((mention) => mention.slice(1));
+  // JSX structure for the Mentions component
+  return (
+    <div className="container">
+      {/* Input element for user text input */}
+      <input
+        id="mention-inp"
+        name="inp"
+        ref={inputRef}
+        value={inpVal}
+        onChange={(e) => handleInputChange(e)}
+        placeholder="Mention"
+      />
 
-    // Update selected mentions and trigger the callback
-    setSelectedMentions(newMentions);
-    onMentionChange(text, newMentions);
-  };
-
-  // Function to handle the selection of a mention from the dropdown
-  const handleNameSelect = (e: MouseEvent<HTMLDivElement>) => {
-    const targetElement = e.target as HTMLElement;
-    const selectedName: string = targetElement.textContent!;
-    const mentionIndex = inpVal.lastIndexOf("@");
-
-    // If '@' is found, replace it with the selected mention
-    if (mentionIndex !== -1) {
-      const newText =
-        inpVal.slice(0, mentionIndex) +
-        `@${selectedName} ` +
-        inpVal.slice(mentionIndex + selectedName.length + 1);
-
-      // Update state variables and trigger the callback
-      setInpVal(newText);
-      setMentionOptions([]);
-      setSelectedMentions([...selectedMentions, selectedName]);
-      onMentionChange(newText, [...selectedMentions, selectedName]);
-    }
-  };
-
-  // Return the state variables and functions for external use
-  return {
-    inpVal,
-    mentionOptions,
-    selectedMentions,
-    handleInputChange,
-    handleNameSelect,
-  };
+      {/* Dropdown container for mention options */}
+      {mentionOptions.length > 0 && (
+        <div
+          className="dropdown-container"
+          onClick={(e) => handleNameSelect(e)}
+        >
+          {/* Map through mention options and display them */}
+          {mentionOptions.map((name: string, index: number) => {
+            return (
+              <p className="list-name" key={name + index}>
+                {name}
+              </p>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 };
 
-// Export the useMentions custom hook
-export default useMentions;
+// Memoize the Mentions component using React.memo for performance optimization
+export default React.memo(Mentions);
